@@ -21,6 +21,9 @@ export const account = pgTable('account', {
   providerId: text('provider_id').notNull(),
   refreshToken: text('refresh_token'),
   accessToken: text('access_token'),
+  accessTokenExpiresAt: timestamp('access_token_expires_at'), 
+  idToken: text('id_token'), // Added for social providers (e.g., Google)
+  scope: text('scope'), // Added to store OAuth scope string
   expiresAt: timestamp('expires_at'),
   password: text('password'),
   createdAt: timestamp('created_at').defaultNow(),
