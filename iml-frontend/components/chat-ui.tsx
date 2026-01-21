@@ -3,11 +3,14 @@
 import { motion } from "framer-motion";
 import { useState } from "react";
 import { Message } from "@/types/chat";
+import { useAuth } from "@/lib/auth-client";
 
 export function ChatUI() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isSigningOut, setIsSigningOut] = useState(false);
+  const { logout, user } = useAuth();
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -42,13 +45,36 @@ export function ChatUI() {
   return (
     <div className="flex flex-col h-screen bg-linear-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
       {/* Header */}
-      <div className="border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-6 py-4">
-        <h1 className="text-2xl font-bold bg-linear-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">
-          IML Chat
-        </h1>
-        <p className="text-gray-600 dark:text-gray-400 text-sm mt-1">
-          Your AI-powered conversation assistant
-        </p>
+      <div className="border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-6 py-4 flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold bg-linear-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">
+            IML Chat
+          </h1>
+          <p className="text-gray-600 dark:text-gray-400 text-sm mt-1">
+            Your AI-powered conversation assistant
+          </p>
+        </div>
+
+        <div className="flex items-center gap-3">
+          <span className="text-sm text-gray-600 dark:text-gray-400 hidden sm:inline">
+            Hello, <strong className="ml-1">{user?.name ?? user?.email}</strong>
+          </span>
+
+          <button
+            onClick={async () => {
+              setIsSigningOut(true);
+              try {
+                await logout();
+              } finally {
+                setIsSigningOut(false);
+              }
+            }}
+            disabled={isSigningOut}
+            className="ml-4 px-3 py-1 text-sm bg-red-50 dark:bg-red-700 text-red-700 dark:text-white rounded-md hover:opacity-90 transition disabled:opacity-50"
+          >
+            {isSigningOut ? "Signing out..." : "Logout"}
+          </button>
+        </div>
       </div>
 
       {/* Messages Container */}

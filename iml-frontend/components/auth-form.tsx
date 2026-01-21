@@ -21,23 +21,45 @@ export function AuthForm() {
 
     try {
       if (isLogin) {
-        await signIn.email({
+        const result = await signIn.email({
           email,
           password,
           callbackURL: "/chat",
         });
+        if (result?.ok) {
+          router.push("/chat");
+        }
       } else {
-        await signUp.email({
+        const result = await signUp.email({
           email,
           password,
           name,
           callbackURL: "/chat",
         });
+        if (result?.ok) {
+          router.push("/chat");
+        }
       }
-      router.push("/chat");
     } catch (err) {
       setError(
         err instanceof Error ? err.message : "An error occurred. Please try again."
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleGoogleSignIn = async () => {
+    try {
+      setError("");
+      setIsLoading(true);
+      await signIn.social({
+        provider: "google",
+        callbackURL: "/chat",
+      });
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : "Google sign-in failed. Please try again."
       );
     } finally {
       setIsLoading(false);
@@ -121,6 +143,22 @@ export function AuthForm() {
           className="w-full py-2 px-4 bg-linear-to-r from-blue-600 to-cyan-600 text-white rounded-lg font-medium hover:opacity-90 disabled:opacity-50 transition"
         >
           {isLoading ? "Loading..." : isLogin ? "Sign In" : "Sign Up"}
+        </button>
+
+        <div className="flex items-center my-4">
+          <div className="grow border-t border-gray-300 dark:border-gray-700"></div>
+          <span className="mx-2 text-gray-400 text-xs">OR</span>
+          <div className="grow border-t border-gray-300 dark:border-gray-700"></div>
+        </div>
+
+        <button
+          type="button"
+          onClick={handleGoogleSignIn}
+          disabled={isLoading}
+          className="w-full py-2 px-4 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg font-medium text-gray-700 dark:text-gray-200 flex items-center justify-center gap-2 hover:bg-gray-50 dark:hover:bg-gray-700 transition disabled:opacity-50"
+        >
+          <svg width="20" height="20" viewBox="0 0 48 48" className="inline-block align-middle mr-2"><g><path fill="#4285F4" d="M43.6 20.5H42V20H24v8h11.3C34.7 32.1 29.8 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c2.7 0 5.2.9 7.2 2.4l6-6C33.5 5.1 28.1 3 24 3 12.9 3 4 11.9 4 23s8.9 20 20 20c11 0 19.7-8 19.7-20 0-1.3-.1-2.7-.3-4z"/><path fill="#34A853" d="M6.3 14.7l6.6 4.8C14.3 16.1 18.8 13 24 13c2.7 0 5.2.9 7.2 2.4l6-6C33.5 5.1 28.1 3 24 3 15.3 3 7.9 8.7 6.3 14.7z"/><path fill="#FBBC05" d="M24 43c5.6 0 10.3-1.8 13.7-4.9l-6.3-5.2C29.8 36 26.1 37 24 37c-5.7 0-10.5-3.8-12.2-9l-6.6 5.1C7.9 39.3 15.3 45 24 45z"/><path fill="#EA4335" d="M43.6 20.5H42V20H24v8h11.3c-1.2 3.1-4.7 7-11.3 7-6.6 0-12-5.4-12-12s5.4-12 12-12c2.7 0 5.2.9 7.2 2.4l6-6C33.5 5.1 28.1 3 24 3 12.9 3 4 11.9 4 23s8.9 20 20 20c11 0 19.7-8 19.7-20 0-1.3-.1-2.7-.3-4z"/></g></svg>
+          Continue with Google
         </button>
       </form>
 

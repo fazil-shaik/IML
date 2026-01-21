@@ -1,7 +1,20 @@
-"use client"
+"use client";
+
 import { AuthForm } from "@/components/auth-form";
+import { useAuth } from "@/lib/auth-client";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 export default function AuthPage() {
+  const { isAuthenticated, isLoading } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!isLoading && isAuthenticated) {
+      router.push("/chat");
+    }
+  }, [isAuthenticated, isLoading, router]);
+
   return (
     <div className="min-h-screen bg-linear-to-br from-gray-900 via-blue-900 to-gray-900 flex items-center justify-center p-4">
       <div className="absolute inset-0 overflow-hidden">
